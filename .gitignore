@@ -1,1 +1,3 @@
 Point-of-Sale/
+*.pyc
+__pycache__/
