@@ -6,22 +6,24 @@ class MenuItemSerializer(serializers.ModelSerializer):
         model = MenuItem
         fields = '__all__'
 
-class OrderItemSerializer(serializers.ModelSerializer):
-    menu_item_name = serializers.CharField(source='menu_item.name', read_only=True)
 
+class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ['id', 'menu_item_name', 'quantity', 'price']
+        fields = ['id', 'menu_item', 'quantity', 'price', 'total_price']
+
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'order_number', 'table_number', 'total_amount', 'payment_status', 'items']
+        fields = ['id', 'order_number', 'table_number', 'total_amount', 'subtotal', 'vat_amount', 'payment_status', 'items']
+
 
 class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
         fields = '__all__'
+
 

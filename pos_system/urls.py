@@ -16,15 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.http import HttpResponse  # Import HttpResponse
+from django.http import HttpResponse
 
-# Add a simple view to handle requests to the root URL
 def home(request):
-    return HttpResponse("Welcome to the home page!")  # Simple response for the homepage
+    return HttpResponse("Welcome to the home page!")
 
 urlpatterns = [
-    path('', home, name='home'),  # This handles requests to '/'
+    path('', home, name='home'),
     path('admin/', admin.site.urls),
     path('api/', include('restaurant.urls')),
 ]
+
 

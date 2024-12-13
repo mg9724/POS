@@ -1,46 +1,44 @@
 from rest_framework import generics
+from rest_framework.response import Response
 from .models import MenuItem, Order, OrderItem, Inventory
-from .serializers import MenuItemSerializer, OrderSerializer, OrderItemSerializer, InventorySerializer
+from .serializers import MenuItemSerializer, OrderSerializer
 
-# View to handle MenuItems
 class MenuItemListCreateView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
 
-# View to handle single MenuItem (retrieve, update, delete)
-class MenuItemDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = MenuItem.objects.all()
-    serializer_class = MenuItemSerializer
 
-# View to handle Orders (List and Create Orders)
-class OrderListCreateView(generics.ListCreateAPIView):
+class GenerateReceiptView(generics.GenericAPIView):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
 
-# View to handle single Order (Retrieve, Update, Delete)
-class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+    def get(self, request, *args, **kwargs):
+        order_id = self.kwargs.get('pk')
+        order = Order.objects.get(id=order_id)
+        return self.generate_json_receipt(order)
 
-# View to handle OrderItems (List and Create Order Items)
-class OrderItemListCreateView(generics.ListCreateAPIView):
-    queryset = OrderItem.objects.all()
-    serializer_class = OrderItemSerializer
+    def generate_json_receipt(self, order):
+        receipt_data = {
+            'order_number': order.order_number,
+            'table_number': order.table_number,
+            'total_amount': order.total_amount,
+            'vat_amount': order.vat_amount,
+            'subtotal': order.subtotal,
+            'items': [
+                {
+                    'menu_item': item.menu_item.name,
+                    'quantity': item.quantity,
+                    'price': item.price,
+                    'total': item.total_price,
+                } for item in order.items.all()
+            ]
+        }
+        return Response(receipt_data)
 
-# View to handle single OrderItem (Retrieve, Update, Delete)
-class OrderItemDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = OrderItem.objects.all()
-    serializer_class = OrderItemSerializer
 
-# View to handle Inventory (List and Create Inventory Items)
-class InventoryListCreateView(generics.ListCreateAPIView):
-    queryset = Inventory.objects.all()
-    serializer_class = InventorySerializer
 
-# View to handle single Inventory Item (Retrieve, Update, Delete)
-class InventoryDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Inventory.objects.all()
-    serializer_class = InventorySerializer
+
+
+
 
 
 
