@@ -1,7 +1,6 @@
 from pathlib import Path
 import os
 import environ
-from dotenv import load_dotenv
 
 # Initialize environment variables
 env = environ.Env()
@@ -10,17 +9,11 @@ environ.Env.read_env()  # Reads the .env file
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from a .env file
-load_dotenv()
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$#ipe*k5cs9^gq1cjr9^@--rq6(u2%$mljc_o)3kwi(in1yjpa'
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-default-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'pos-8ewq.onrender.com']
 
@@ -66,7 +59,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pos_system.wsgi.application'
 
-# Database
+# Database configuration
 DATABASES = {
     'default': env.db(),  # This will automatically parse DATABASE_URL from .env file
 }
@@ -95,8 +88,34 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Add this for production
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'  # Add this for production
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging configuration (for production)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs/django_errors.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
+
 
 

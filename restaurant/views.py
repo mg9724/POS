@@ -1,3 +1,4 @@
+from . import views
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,6 +9,10 @@ from .serializers import MenuItemSerializer, OrderSerializer
 class MenuItemListCreateView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
+
+class OrderRetrieveView(generics.RetrieveAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
 
 
 # Order List and Create View
