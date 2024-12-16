@@ -1,19 +1,33 @@
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework import status
 from .models import MenuItem, Order, OrderItem, Inventory
 from .serializers import MenuItemSerializer, OrderSerializer
 
+# MenuItem View (already working fine)
 class MenuItemListCreateView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
 
 
+# Order List and Create View
+class OrderListCreateView(generics.ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+
+# Generate Receipt View (fixed)
 class GenerateReceiptView(generics.GenericAPIView):
     queryset = Order.objects.all()
 
     def get(self, request, *args, **kwargs):
         order_id = self.kwargs.get('pk')
-        order = Order.objects.get(id=order_id)
+        
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+
         return self.generate_json_receipt(order)
 
     def generate_json_receipt(self, order):

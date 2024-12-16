@@ -46,8 +46,23 @@ class OrderItem(models.Model):
         return f"{self.quantity} x {self.menu_item.name}"
 
     def save(self, *args, **kwargs):
+        # Calculate the total price for the order item
         self.total_price = self.quantity * self.price
         super().save(*args, **kwargs)
+
+        # Deduct the ordered quantity from the inventory (if item exists)
+        inventory_item = Inventory.objects.filter(item_name=self.menu_item.name).first()
+        if inventory_item:
+            if inventory_item.quantity >= self.quantity:
+                inventory_item.quantity -= self.quantity
+                inventory_item.save()
+            else:
+                raise ValueError(f"Not enough stock for {self.menu_item.name}")
+        else:
+            raise ValueError(f"Inventory item {self.menu_item.name} does not exist.")
+
+        # Recalculate the total for the parent order after the new item is saved
+        self.order.calculate_totals()
 
 
 class Inventory(models.Model):
@@ -58,6 +73,7 @@ class Inventory(models.Model):
 
     def __str__(self):
         return self.item_name
+
 
 
 
